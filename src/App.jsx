@@ -1,0 +1,215 @@
+import { useState } from "react";
+import "./App.css";
+
+// ⚠️ Troque os links abaixo pelos links reais dos mapas de cada região
+// (Google My Maps ou o mapa digital que vocês estão usando).
+// Os "path" abaixo foram extraídos automaticamente da imagem que você
+// enviou, então o contorno de cada região é fiel ao desenho original.
+const REGIOES = [
+  {
+    "id": "brazlandia",
+    "nome": "Brazlândia",
+    "cor": "#93D126",
+    "corClara": "#EEF7DD",
+    "link": "https://www.google.com/maps/d/u/0/edit?mid=1q8lxidEbENiBrfhr-AGEpUDGeEueCas&usp=sharing",
+    "path": "M 886 197 L 868 192 L 860 180 L 833 177 L 828 170 L 827 158 L 822 154 L 775 152 L 770 146 L 762 116 L 755 108 L 756 89 L 749 80 L 749 67 L 740 60 L 732 43 L 727 43 L 709 66 L 700 68 L 700 84 L 689 94 L 690 113 L 680 122 L 679 131 L 672 139 L 664 140 L 655 147 L 620 142 L 589 147 L 566 135 L 546 144 L 530 144 L 485 128 L 477 128 L 466 136 L 447 141 L 430 141 L 419 151 L 389 146 L 360 150 L 341 142 L 327 153 L 316 156 L 293 170 L 273 169 L 262 155 L 247 151 L 231 164 L 191 160 L 186 175 L 172 185 L 171 210 L 165 222 L 163 237 L 165 243 L 175 248 L 179 260 L 192 266 L 192 279 L 189 287 L 182 293 L 180 311 L 177 314 L 163 314 L 160 327 L 149 335 L 146 347 L 135 354 L 131 362 L 133 384 L 147 392 L 147 405 L 157 415 L 157 434 L 163 442 L 165 462 L 154 469 L 153 483 L 136 504 L 125 507 L 125 519 L 117 527 L 114 538 L 106 544 L 107 551 L 113 556 L 113 568 L 94 603 L 94 607 L 102 614 L 102 626 L 109 632 L 107 659 L 112 662 L 115 671 L 127 672 L 133 676 L 144 691 L 145 705 L 156 718 L 156 732 L 151 747 L 139 754 L 135 766 L 125 773 L 129 789 L 142 791 L 152 781 L 171 781 L 177 785 L 181 797 L 191 797 L 196 792 L 205 790 L 217 775 L 242 773 L 256 758 L 263 756 L 269 740 L 278 733 L 287 731 L 294 721 L 288 710 L 288 697 L 278 679 L 278 666 L 286 659 L 289 646 L 302 635 L 301 614 L 306 609 L 317 606 L 322 596 L 335 589 L 358 567 L 371 567 L 389 577 L 395 577 L 406 572 L 425 554 L 437 552 L 454 509 L 475 510 L 496 516 L 504 516 L 515 510 L 528 510 L 544 519 L 551 519 L 568 502 L 578 500 L 592 487 L 605 486 L 623 468 L 644 468 L 655 459 L 669 459 L 683 466 L 712 464 L 732 468 L 746 479 L 751 488 L 772 487 L 778 493 L 784 493 L 793 481 L 799 479 L 801 470 L 809 461 L 826 454 L 831 438 L 846 419 L 849 407 L 863 401 L 871 392 L 871 385 L 862 372 L 861 353 L 820 354 L 814 350 L 814 338 L 828 315 L 830 294 L 850 281 L 865 280 L 866 274 L 873 271 L 872 241 L 881 233 L 881 216 L 886 208 Z",
+    "cx": 455,
+    "cy": 373,
+    "lines": [
+      "Brazlândia"
+    ]
+  },
+  {
+    "id": "ceilandia",
+    "nome": "Ceilândia",
+    "cor": "#EE222D",
+    "corClara": "#FCE1E2",
+    "link": "https://www.google.com/maps/d/edit?mid=1-887__RZJzYrwdyKk5Fck_7Up0S4KTs&usp=sharing",
+    "path": "M 1162 729 L 1153 725 L 1148 712 L 1136 704 L 1137 680 L 1120 676 L 1108 655 L 1085 656 L 1068 643 L 1066 629 L 1050 620 L 1041 607 L 1043 585 L 1031 573 L 1031 552 L 1020 546 L 1008 532 L 1009 511 L 1004 503 L 993 496 L 987 477 L 968 468 L 934 460 L 931 457 L 930 440 L 913 433 L 891 406 L 876 403 L 858 414 L 854 430 L 840 445 L 833 463 L 816 469 L 809 483 L 789 504 L 776 504 L 767 497 L 746 498 L 731 479 L 708 474 L 681 476 L 660 469 L 650 478 L 628 478 L 611 496 L 596 498 L 587 509 L 573 512 L 555 530 L 541 530 L 523 520 L 508 526 L 491 526 L 460 519 L 447 557 L 439 563 L 429 564 L 413 580 L 399 588 L 387 588 L 368 577 L 361 577 L 341 598 L 330 603 L 323 615 L 311 619 L 312 640 L 298 652 L 297 662 L 288 671 L 298 693 L 299 707 L 306 713 L 306 726 L 294 739 L 278 746 L 275 758 L 281 760 L 299 781 L 320 782 L 334 772 L 348 772 L 359 780 L 382 778 L 399 790 L 414 790 L 460 761 L 469 747 L 482 746 L 491 741 L 536 741 L 540 744 L 548 765 L 564 767 L 592 791 L 616 791 L 639 815 L 683 815 L 696 834 L 705 835 L 724 850 L 742 852 L 765 892 L 772 892 L 781 886 L 793 886 L 812 894 L 816 898 L 816 911 L 827 920 L 832 935 L 840 941 L 848 941 L 861 933 L 875 931 L 895 908 L 901 895 L 909 890 L 921 890 L 926 878 L 934 871 L 955 868 L 966 878 L 991 878 L 999 864 L 999 853 L 1007 829 L 1018 822 L 1023 809 L 1053 801 L 1061 786 L 1068 780 L 1083 776 L 1115 780 L 1123 763 L 1139 747 L 1159 742 Z",
+    "cx": 744,
+    "cy": 670,
+    "lines": [
+      "Ceilândia"
+    ]
+  },
+  {
+    "id": "sol-nascente",
+    "nome": "Sol Nascente / Pôr do Sol",
+    "cor": "#FEDF0A",
+    "corClara": "#FFF8DC",
+    "link": "https://www.google.com/maps/d/edit?mid=1g0eqc50W_EnjUEPBj8EKms4VpQX16K4&usp=sharing",
+    "path": "M 806 902 L 794 901 L 790 896 L 784 896 L 774 903 L 760 902 L 735 861 L 717 860 L 702 846 L 688 842 L 678 825 L 634 825 L 613 801 L 587 801 L 563 779 L 553 774 L 542 774 L 533 755 L 515 749 L 473 757 L 466 770 L 455 773 L 444 786 L 433 788 L 421 798 L 392 798 L 378 787 L 354 790 L 345 782 L 338 782 L 324 792 L 292 790 L 280 778 L 277 769 L 260 768 L 247 783 L 224 784 L 215 796 L 202 802 L 203 810 L 216 819 L 217 838 L 224 847 L 243 847 L 258 866 L 259 886 L 268 892 L 273 902 L 272 923 L 277 931 L 277 943 L 265 950 L 263 967 L 253 976 L 253 992 L 242 1003 L 242 1010 L 248 1020 L 250 1048 L 282 1042 L 289 1036 L 316 1038 L 316 1057 L 323 1065 L 323 1080 L 329 1087 L 328 1106 L 339 1114 L 338 1149 L 331 1155 L 333 1178 L 324 1203 L 334 1202 L 340 1190 L 356 1183 L 360 1166 L 373 1158 L 380 1142 L 392 1134 L 402 1119 L 413 1119 L 427 1111 L 440 1111 L 454 1127 L 463 1127 L 468 1132 L 473 1132 L 500 1118 L 512 1108 L 542 1109 L 566 1089 L 597 1091 L 616 1096 L 634 1079 L 653 1080 L 664 1062 L 671 1058 L 698 1058 L 711 1045 L 724 1044 L 734 1026 L 742 1023 L 749 1014 L 767 1013 L 772 998 L 778 992 L 788 988 L 797 979 L 814 977 L 814 960 L 826 949 L 819 927 L 807 919 Z",
+    "cx": 464,
+    "cy": 934,
+    "lines": [
+      "Sol Nascente /",
+      "Pôr do Sol"
+    ]
+  }
+];
+
+function MapaTerritorio({ regiaoAtiva, setRegiaoAtiva }) {
+  return (
+    <svg
+      viewBox="0 0 1254 1254"
+      className="mapa-svg"
+      role="group"
+      aria-label="Mapa com três regiões: Brazlândia, Ceilândia e Sol Nascente/Pôr do Sol"
+    >
+      {REGIOES.map((regiao) => {
+        const ativa = regiaoAtiva === regiao.id;
+        return (
+          <g key={regiao.id}>
+            <path
+              d={regiao.path}
+              fill={regiao.cor}
+              className="mapa-regiao"
+              opacity={regiaoAtiva === null ? 1 : ativa ? 1 : 0.45}
+              tabIndex={0}
+              role="button"
+              aria-label={`Abrir mapa de ${regiao.nome}`}
+              onMouseEnter={() => setRegiaoAtiva(regiao.id)}
+              onMouseLeave={() => setRegiaoAtiva(null)}
+              onFocus={() => setRegiaoAtiva(regiao.id)}
+              onBlur={() => setRegiaoAtiva(null)}
+              onClick={() => window.open(regiao.link, "_blank", "noopener")}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  window.open(regiao.link, "_blank", "noopener");
+                }
+              }}
+            />
+            <text
+              x={regiao.cx}
+              y={regiao.cy}
+              textAnchor="middle"
+              className="mapa-rotulo"
+              style={{ pointerEvents: "none" }}
+            >
+              {regiao.lines.map((linha, i) => (
+                <tspan key={linha} x={regiao.cx} dy={i === 0 ? 0 : 46}>
+                  {linha}
+                </tspan>
+              ))}
+            </text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+export default function App() {
+  const [regiaoAtiva, setRegiaoAtiva] = useState(null);
+
+  const regiaoDestacada = REGIOES.find((r) => r.id === regiaoAtiva);
+
+  return (
+    <div className="pagina">
+      {/* ABERTURA */}
+      <header className="secao-abertura">
+        <div className="abertura-conteudo">
+          <h1>Conheça a rede de cuidado do seu território</h1>
+          <p>
+            Um espaço para visualizar os principais serviços disponíveis em
+            Brazlândia, Ceilândia e Sol Nascente/Pôr do Sol, entendendo onde
+            estão localizados e qual é a função de cada um.
+          </p>
+          <a href="#mapa" className="botao-explorar">
+            Explorar o mapa ↓
+          </a>
+        </div>
+      </header>
+
+      {/* MAPA */}
+      <section id="mapa" className="secao-mapa">
+        <div className="mapa-cabecalho">
+          <h2>Seu mapa</h2>
+          <p>
+            Toque em uma região para abrir o mapa digital com os serviços
+            daquele território.
+          </p>
+        </div>
+
+        <div className="mapa-corpo">
+          <MapaTerritorio
+            regiaoAtiva={regiaoAtiva}
+            setRegiaoAtiva={setRegiaoAtiva}
+          />
+
+          <div className="mapa-legenda">
+            {REGIOES.map((regiao) => (
+              <button
+                key={regiao.id}
+                className="legenda-item"
+                style={{
+                  borderColor: regiao.cor,
+                  background:
+                    regiaoAtiva === regiao.id ? regiao.corClara : "transparent",
+                }}
+                onMouseEnter={() => setRegiaoAtiva(regiao.id)}
+                onMouseLeave={() => setRegiaoAtiva(null)}
+                onFocus={() => setRegiaoAtiva(regiao.id)}
+                onBlur={() => setRegiaoAtiva(null)}
+                onClick={() => window.open(regiao.link, "_blank", "noopener")}
+              >
+                <span
+                  className="legenda-cor"
+                  style={{ background: regiao.cor }}
+                />
+                {regiao.nome}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <p className="mapa-dica" aria-live="polite">
+          {regiaoDestacada
+            ? `Abrir mapa de ${regiaoDestacada.nome}`
+            : "Passe o mouse ou toque em uma das três regiões acima"}
+        </p>
+      </section>
+
+      {/* SOBRE O PROJETO */}
+      <section className="secao-sobre">
+        <div className="sobre-conteudo">
+          <h2>Sobre o projeto</h2>
+          <p>
+            Este projeto foi desenvolvido por estudantes de Terapia
+            Ocupacional com o objetivo de apresentar, de forma visual e
+            acessível, os serviços presentes no território e sua importância
+            para a rede de cuidado.
+          </p>
+
+          <dl className="sobre-ficha">
+            <div>
+              <dt>Curso</dt>
+              <dd>Terapia Ocupacional</dd>
+            </div>
+            <div>
+              <dt>Instituição</dt>
+              <dd>IESB</dd>
+            </div>
+            <div>
+              <dt>Disciplina</dt>
+              <dd>Terapia Ocupacional na Saúde Mental</dd>
+            </div>
+            <div>
+              <dt>Ano</dt>
+              <dd>2026</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
+      {/* RODAPÉ */}
+      <footer className="rodape">
+        <p>
+          Conhecer o território e também conhecer os caminhos possíveis para
+          o cuidado.
+        </p>
+      </footer>
+    </div>
+  );
+}

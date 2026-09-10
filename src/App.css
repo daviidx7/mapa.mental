@@ -1,0 +1,277 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap");
+
+:root {
+  --papel: #faefdb;
+  --tinta: #2a2620;
+  --tinta-suave: #5b564c;
+  --verde: #5e8a2e;
+  --verde-claro: #eaf3de;
+  --vermelho: #c13b3b;
+  --vermelho-claro: #fbe7e7;
+  --amarelo: #d9a526;
+  --amarelo-claro: #fbf1dc;
+  --acento: #2f6f62;
+  --linha: #e0d3b8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--papel);
+  color: var(--tinta);
+  font-family: "Inter", -apple-system, sans-serif;
+}
+
+.pagina {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+h1,
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 500;
+  margin: 0 0 0.6em;
+  line-height: 1.35;
+}
+
+p {
+  line-height: 1.6;
+  color: var(--tinta-suave);
+}
+
+a {
+  color: inherit;
+}
+
+/* ---------- Abertura ---------- */
+
+.secao-abertura {
+  padding: 7rem 1.5rem 5rem;
+  border-bottom: 1px solid var(--linha);
+}
+
+.abertura-conteudo {
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.secao-abertura h1 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  color: var(--tinta);
+}
+
+.secao-abertura p {
+  font-size: 1.1rem;
+  max-width: 52ch;
+  margin: 0 auto 2.2rem;
+}
+
+.botao-explorar {
+  display: inline-block;
+  text-decoration: none;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #fff;
+  background: var(--acento);
+  padding: 0.85rem 1.8rem;
+  border-radius: 3px;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.botao-explorar:hover {
+  background: #275c51;
+  transform: translateY(-1px);
+}
+
+.botao-explorar:focus-visible {
+  outline: 3px solid var(--acento);
+  outline-offset: 3px;
+}
+
+/* ---------- Mapa ---------- */
+
+.secao-mapa {
+  padding: 5rem 1.5rem 6rem;
+  border-bottom: 1px solid var(--linha);
+}
+
+.mapa-cabecalho {
+  max-width: 640px;
+  margin: 0 auto 2.5rem;
+  text-align: center;
+}
+
+.mapa-cabecalho h2 {
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+}
+
+.mapa-corpo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.mapa-svg {
+  width: 100%;
+  max-width: 540px;
+  height: auto;
+}
+
+.mapa-regiao {
+  cursor: pointer;
+  stroke: #201d17;
+  stroke-width: 5;
+  stroke-linejoin: round;
+  transition: opacity 0.2s ease;
+}
+
+.mapa-regiao:focus-visible {
+  outline: 3px solid var(--tinta);
+  outline-offset: 2px;
+}
+
+.mapa-rotulo {
+  font-family: "Fraunces", serif;
+  font-weight: 700;
+  font-size: 3.6rem;
+  fill: #201d17;
+}
+
+.mapa-legenda {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.legenda-item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: "Inter", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--tinta);
+  background: transparent;
+  border: 1.5px solid var(--linha);
+  border-radius: 999px;
+  padding: 0.5rem 1.1rem;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.legenda-cor {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.mapa-dica {
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 0.95rem;
+  min-height: 1.4em;
+}
+
+/* ---------- Sobre ---------- */
+
+.secao-sobre {
+  padding: 5rem 1.5rem;
+  border-bottom: 1px solid var(--linha);
+}
+
+.sobre-conteudo {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.secao-sobre h2 {
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+}
+
+.secao-sobre p {
+  font-size: 1.05rem;
+  max-width: 62ch;
+}
+
+.sobre-ficha {
+  margin: 2.5rem 0 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.4rem 2rem;
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--linha);
+}
+
+.sobre-ficha div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.sobre-ficha dt {
+  font-size: 0.85rem;
+  color: var(--tinta-suave);
+}
+
+.sobre-ficha dd {
+  margin: 0;
+  font-family: "Fraunces", serif;
+  font-size: 1.1rem;
+}
+
+/* ---------- Rodapé ---------- */
+
+.rodape {
+  padding: 3.5rem 1.5rem;
+  text-align: center;
+}
+
+.rodape p {
+  font-family: "Fraunces", serif;
+  font-style: italic;
+  font-size: 1.15rem;
+  color: var(--tinta);
+  max-width: 44ch;
+  margin: 0 auto;
+}
+
+/* ---------- Responsivo ---------- */
+
+@media (min-width: 720px) {
+  .sobre-ficha {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .secao-abertura {
+    padding: 5rem 1.2rem 3.5rem;
+  }
+  .secao-mapa,
+  .secao-sobre {
+    padding: 3.5rem 1.2rem;
+  }
+}
