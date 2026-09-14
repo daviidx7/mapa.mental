@@ -30,6 +30,13 @@ html {
     transition: none !important;
     animation: none !important;
   }
+  /* Sem a animação, o texto ficaria preso em opacidade 0 pra sempre.
+     Isso garante que tudo continue visível mesmo sem a animação. */
+  .entrada,
+  .revela {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
 
 body {
