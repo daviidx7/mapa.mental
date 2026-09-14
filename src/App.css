@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap");
 
 :root {
-  --papel: #faefdb;
+  --papel: #f3e9d8;
   --tinta: #2a2620;
   --tinta-suave: #5b564c;
   --verde: #5e8a2e;
@@ -61,6 +61,72 @@ a {
   color: inherit;
 }
 
+/* ---------- Animações utilitárias ---------- */
+
+/* Entrada em cascata no topo da página (sempre visível ao carregar) */
+@keyframes fadeSobe {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.entrada {
+  opacity: 0;
+  animation: fadeSobe 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.entrada-1 {
+  animation-delay: 0.05s;
+}
+.entrada-2 {
+  animation-delay: 0.2s;
+}
+.entrada-3 {
+  animation-delay: 0.35s;
+}
+
+/* Revelação ao rolar a página */
+.revela {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.revela-visivel {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Itens que aparecem em cascata dentro de uma seção revelada */
+.revela .legenda-item,
+.revela .territorio-card,
+.revela .servico-card {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s ease, transform 0.5s ease,
+    border-color 0.15s ease;
+}
+
+.revela-visivel .legenda-item,
+.revela-visivel .territorio-card,
+.revela-visivel .servico-card {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Inclinação 3D ao passar o mouse */
+.tilt {
+  transition: transform 0.2s ease-out;
+  will-change: transform;
+  transform-style: preserve-3d;
+}
+
 /* ---------- Abertura ---------- */
 
 .secao-abertura {
@@ -95,12 +161,18 @@ a {
   background: var(--acento);
   padding: 0.85rem 1.8rem;
   border-radius: 3px;
-  transition: transform 0.15s ease, background 0.15s ease;
+  transition: transform 0.15s ease, background 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .botao-explorar:hover {
   background: #275c51;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(47, 111, 98, 0.25);
+}
+
+.botao-explorar:active {
+  transform: translateY(0) scale(0.97);
 }
 
 .botao-explorar:focus-visible {
@@ -132,10 +204,16 @@ a {
   gap: 2rem;
 }
 
-.mapa-svg {
+.mapa-tilt {
   width: 100%;
   max-width: 540px;
+  filter: drop-shadow(0 18px 30px rgba(42, 38, 32, 0.18));
+}
+
+.mapa-svg {
+  width: 100%;
   height: auto;
+  display: block;
 }
 
 .mapa-regiao {
@@ -143,7 +221,15 @@ a {
   stroke: #201d17;
   stroke-width: 5;
   stroke-linejoin: round;
-  transition: opacity 0.2s ease;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: opacity 0.2s ease, transform 0.2s ease,
+    filter 0.2s ease;
+}
+
+.mapa-regiao:hover {
+  transform: scale(1.015);
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.2));
 }
 
 .mapa-regiao:focus-visible {
@@ -178,7 +264,16 @@ a {
   border-radius: 999px;
   padding: 0.5rem 1.1rem;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.legenda-item:hover {
+  transform: translateY(-2px);
+}
+
+.legenda-item:active {
+  transform: translateY(0) scale(0.96);
 }
 
 .legenda-cor {
@@ -193,6 +288,286 @@ a {
   margin-top: 2rem;
   font-size: 0.95rem;
   min-height: 1.4em;
+}
+
+/* ---------- Conhecendo o território ---------- */
+
+.secao-territorio {
+  padding: 5rem 1.5rem;
+  border-bottom: 1px solid var(--linha);
+}
+
+.territorio-cabecalho {
+  max-width: 640px;
+  margin: 0 auto 2.5rem;
+  text-align: center;
+}
+
+.territorio-cabecalho h2 {
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+}
+
+.territorio-grade {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+@media (min-width: 640px) {
+  .territorio-grade {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 960px) {
+  .territorio-grade {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.territorio-card {
+  background: #fffdf8;
+  border: 1px solid var(--linha);
+  border-radius: 10px;
+  padding: 1.8rem 1.6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1.2rem;
+  height: 100%;
+  transition: border-color 0.15s ease, box-shadow 0.2s ease;
+}
+
+.territorio-card:hover {
+  border-color: var(--acento);
+  box-shadow: 0 14px 26px rgba(42, 38, 32, 0.12);
+}
+
+.territorio-topo {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  min-height: 2.6rem;
+}
+
+.territorio-ponto {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 0.45rem;
+}
+
+.territorio-topo h3 {
+  font-family: "Fraunces", serif;
+  font-weight: 600;
+  font-size: 1.2rem;
+  margin: 0;
+  color: var(--tinta);
+}
+
+.territorio-stats {
+  margin: 0;
+  display: flex;
+  gap: 1.6rem;
+}
+
+.territorio-stats dt {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--tinta-suave);
+}
+
+.territorio-stats dd {
+  margin: 0.15rem 0 0;
+  font-family: "Fraunces", serif;
+  font-size: 1.05rem;
+  color: var(--tinta);
+}
+
+.territorio-nao-identificados {
+  border-top: 1px dashed var(--linha);
+  padding-top: 1rem;
+}
+
+.territorio-nao-identificados-titulo {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--tinta);
+}
+
+.territorio-nao-identificados ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.territorio-nao-identificados li {
+  font-size: 0.88rem;
+  color: var(--tinta-suave);
+  line-height: 1.45;
+}
+
+.territorio-explorar {
+  margin-top: auto;
+  align-self: flex-start;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--acento);
+  text-decoration: none;
+}
+
+.territorio-explorar:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Serviços ---------- */
+
+.secao-servicos {
+  padding: 3.5rem 1.5rem;
+  border-bottom: 1px solid var(--linha);
+}
+
+.servicos-cabecalho {
+  max-width: 640px;
+  margin: 0 auto 2.5rem;
+  text-align: center;
+}
+
+.servicos-cabecalho h2 {
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+}
+
+.servicos-grade {
+  max-width: 760px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.servico-card {
+  background: #fffdf8;
+  border: 1px solid var(--linha);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: border-color 0.15s ease, box-shadow 0.2s ease;
+}
+
+.servico-card:hover {
+  border-color: var(--acento);
+  box-shadow: 0 14px 26px rgba(42, 38, 32, 0.12);
+}
+
+.servico-topo {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  padding: 1.5rem 1.4rem;
+  font-family: inherit;
+  color: var(--tinta);
+}
+
+.servico-topo:focus-visible {
+  outline: 3px solid var(--acento);
+  outline-offset: -3px;
+}
+
+.servico-emoji {
+  font-size: 1.7rem;
+  flex-shrink: 0;
+  display: inline-block;
+  animation: flutuar 3.4s ease-in-out infinite;
+}
+
+@keyframes flutuar {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.servico-titulos {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.servico-titulos h3 {
+  font-family: "Fraunces", serif;
+  font-weight: 600;
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.servico-titulos p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--tinta-suave);
+}
+
+.servico-seta {
+  flex-shrink: 0;
+  font-size: 1rem;
+  color: var(--tinta-suave);
+  transition: transform 0.25s ease;
+}
+
+.servico-seta.aberta {
+  transform: rotate(180deg);
+}
+
+.servico-explicacao {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.3s ease, opacity 0.25s ease;
+}
+
+.servico-explicacao.aberta {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.servico-explicacao-interior {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.8rem;
+  padding: 0 1.4rem;
+}
+
+.servico-explicacao.aberta .servico-explicacao-interior {
+  padding: 0 1.4rem 1.4rem;
+}
+
+.servico-explicacao-interior p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--tinta-suave);
+}
+
+.servico-encontra strong {
+  color: var(--tinta);
 }
 
 /* ---------- Sobre ---------- */
@@ -242,6 +617,46 @@ a {
   font-size: 1.1rem;
 }
 
+.sobre-autores {
+  margin-top: 2.2rem;
+  padding-top: 1.8rem;
+  border-top: 1px solid var(--linha);
+  text-align: center;
+}
+
+.sobre-autores-titulo {
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--tinta-suave);
+}
+
+.autores-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem 0.7rem;
+}
+
+.autores-lista li {
+  font-family: "Fraunces", serif;
+  font-size: 1rem;
+  color: var(--tinta);
+  background: #fffdf8;
+  border: 1px solid var(--linha);
+  border-radius: 999px;
+  padding: 0.45rem 1.1rem;
+  transition: transform 0.15s ease;
+}
+
+.autores-lista li:hover {
+  transform: translateY(-2px);
+}
+
 /* ---------- Rodapé ---------- */
 
 .rodape {
@@ -271,7 +686,19 @@ a {
     padding: 5rem 1.2rem 3.5rem;
   }
   .secao-mapa,
-  .secao-sobre {
+  .secao-sobre,
+  .secao-territorio {
     padding: 3.5rem 1.2rem;
+  }
+  .servicos-grade {
+    grid-template-columns: 1fr;
+  }
+  .territorio-grade {
+    grid-template-columns: 1fr;
+  }
+  /* Em telas pequenas, a inclinação 3D pelo mouse fica desligada
+     (não faz sentido em touch) para não atrapalhar o toque. */
+  .tilt {
+    transform: none !important;
   }
 }
