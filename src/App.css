@@ -613,6 +613,19 @@ a {
   margin: 0 auto;
 }
 
+.rodape-credito {
+  display: inline-block;
+  margin-top: 1.4rem;
+  font-size: 0.78rem;
+  color: var(--tinta-suave);
+  text-decoration: none;
+}
+
+.rodape-credito:hover {
+  color: var(--acento);
+  text-decoration: underline;
+}
+
 /* ---------- Responsivo ---------- */
 
 @media (min-width: 720px) {
