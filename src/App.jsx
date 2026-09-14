@@ -429,7 +429,7 @@ export default function App() {
           o cuidado.
         </p>
         <a
-          href="https://www.instagram.com/daviidev/"
+          href="https://www.instagram.com/daviiddev/"
           target="_blank"
           rel="noopener noreferrer"
           className="rodape-credito"
