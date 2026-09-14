@@ -13,6 +13,10 @@
   --acento: #2f6f62;
   --linha: #e0d3b8;
   --cartao: #fbf4e6;
+  /* Avisa o navegador que este site é só modo claro, pra ele não
+     tentar "escurecer automaticamente" e inverter as cores do texto
+     no celular (isso deixava os títulos meio brancos/apagados). */
+  color-scheme: light;
 }
 
 * {
@@ -51,6 +55,7 @@ h2 {
   font-weight: 500;
   margin: 0 0 0.6em;
   line-height: 1.35;
+  color: var(--tinta);
 }
 
 p {
@@ -455,6 +460,7 @@ a {
   font-weight: 600;
   font-size: 1.2rem;
   margin: 0;
+  color: var(--tinta);
 }
 
 .servico-titulos p {
