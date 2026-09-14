@@ -1,5 +1,4 @@
 import { useState } from "react";
-import "./App.css";
 
 const REGIOES = [
   {
@@ -61,7 +60,6 @@ const REGIOES = [
   },
 ];
 
-// Toque em cada serviço para ver o que ele faz.
 const SERVICOS = [
   {
     id: "caps",
@@ -97,30 +95,35 @@ const SERVICOS = [
   },
 ];
 
-// Wrapper que inclina o conteúdo em 3D seguindo o cursor do mouse
-// (não faz nada em telas de toque, já que não existe "mouse move" ali).
-function Tilt({ children, max = 8, className = "", ...props }) {
-  const [transform, setTransform] = useState(
-    "perspective(1000px) rotateX(0deg) rotateY(0deg)"
-  );
+const cores = {
+  papel: "#f3e9d8",
+  tinta: "#2a2620",
+  tintaSuave: "#5b564c",
+  acento: "#2f6f62",
+  linha: "#e0d3b8",
+};
 
+// Wrapper que inclina o conteúdo em 3D seguindo o cursor do mouse
+// (não faz nada em telas de toque).
+function Tilt({ children, max = 8, style = {}, ...props }) {
+  const [rot, setRot] = useState({ x: 0, y: 0 });
   function aoMover(e) {
     const rect = e.currentTarget.getBoundingClientRect();
     const px = (e.clientX - rect.left) / rect.width - 0.5;
     const py = (e.clientY - rect.top) / rect.height - 0.5;
-    setTransform(
-      `perspective(1000px) rotateX(${(py * -max).toFixed(2)}deg) rotateY(${(px * max).toFixed(2)}deg)`
-    );
+    setRot({ x: py * -max, y: px * max });
   }
-
   function aoSair() {
-    setTransform("perspective(1000px) rotateX(0deg) rotateY(0deg)");
+    setRot({ x: 0, y: 0 });
   }
-
   return (
     <div
-      className={`tilt ${className}`}
-      style={{ transform }}
+      style={{
+        transform: `perspective(1000px) rotateX(${rot.x}deg) rotateY(${rot.y}deg)`,
+        transition: "transform 0.2s ease-out",
+        willChange: "transform",
+        ...style,
+      }}
       onMouseMove={aoMover}
       onMouseLeave={aoSair}
       {...props}
@@ -134,7 +137,7 @@ function MapaTerritorio({ regiaoAtiva, setRegiaoAtiva }) {
   return (
     <svg
       viewBox="0 0 1254 1254"
-      className="mapa-svg"
+      style={{ width: "100%", height: "auto", display: "block" }}
       role="group"
       aria-label="Mapa com três regiões: Brazlândia, Ceilândia e Sol Nascente/Pôr do Sol"
     >
@@ -145,13 +148,29 @@ function MapaTerritorio({ regiaoAtiva, setRegiaoAtiva }) {
             <path
               d={regiao.path}
               fill={regiao.cor}
-              className="mapa-regiao"
-              opacity={regiaoAtiva === null ? 1 : ativa ? 1 : 0.45}
+              stroke="#201d17"
+              strokeWidth={5}
+              strokeLinejoin="round"
+              style={{
+                cursor: "pointer",
+                transformBox: "fill-box",
+                transformOrigin: "center",
+                transition: "opacity 0.2s ease, transform 0.2s ease, filter 0.2s ease",
+                opacity: regiaoAtiva === null ? 1 : ativa ? 1 : 0.45,
+              }}
+              onMouseEnter={(e) => {
+                setRegiaoAtiva(regiao.id);
+                e.currentTarget.style.transform = "scale(1.015)";
+                e.currentTarget.style.filter = "drop-shadow(0 6px 10px rgba(0,0,0,0.2))";
+              }}
+              onMouseLeave={(e) => {
+                setRegiaoAtiva(null);
+                e.currentTarget.style.transform = "scale(1)";
+                e.currentTarget.style.filter = "none";
+              }}
               tabIndex={0}
               role="button"
               aria-label={`Abrir mapa de ${regiao.nome}`}
-              onMouseEnter={() => setRegiaoAtiva(regiao.id)}
-              onMouseLeave={() => setRegiaoAtiva(null)}
               onFocus={() => setRegiaoAtiva(regiao.id)}
               onBlur={() => setRegiaoAtiva(null)}
               onClick={() => window.open(regiao.link, "_blank", "noopener")}
@@ -166,8 +185,7 @@ function MapaTerritorio({ regiaoAtiva, setRegiaoAtiva }) {
               x={regiao.cx}
               y={regiao.cy}
               textAnchor="middle"
-              className="mapa-rotulo"
-              style={{ pointerEvents: "none" }}
+              style={{ pointerEvents: "none", fontFamily: "Georgia, serif", fontWeight: 700, fontSize: "3.6rem", fill: "#201d17" }}
             >
               {regiao.lines.map((linha, i) => (
                 <tspan key={linha} x={regiao.cx} dy={i === 0 ? 0 : 46}>
@@ -185,248 +203,309 @@ function MapaTerritorio({ regiaoAtiva, setRegiaoAtiva }) {
 export default function App() {
   const [regiaoAtiva, setRegiaoAtiva] = useState(null);
   const [servicosAbertos, setServicosAbertos] = useState([]);
-
   const regiaoDestacada = REGIOES.find((r) => r.id === regiaoAtiva);
 
   function alternarServico(id) {
     setServicosAbertos((abertos) =>
-      abertos.includes(id)
-        ? abertos.filter((item) => item !== id)
-        : [...abertos, id]
+      abertos.includes(id) ? abertos.filter((item) => item !== id) : [...abertos, id]
     );
   }
 
   return (
-    <div className="pagina">
+    <div style={{ background: cores.papel, color: cores.tinta, fontFamily: "system-ui, sans-serif", overflowX: "hidden" }}>
+      <style>{`
+        @keyframes flutuar { 0%,100% { transform: translateY(0);} 50% { transform: translateY(-4px);} }
+        .servico-emoji-anim { display:inline-block; animation: flutuar 3.4s ease-in-out infinite; }
+        .territorio-grade-preview { grid-template-columns: 1fr; }
+        @media (min-width: 640px) { .territorio-grade-preview { grid-template-columns: repeat(2, minmax(0,1fr)) !important; } }
+        @media (min-width: 960px) { .territorio-grade-preview { grid-template-columns: repeat(3, minmax(0,1fr)) !important; } }
+        .servicos-grade-preview { grid-template-columns: 1fr; }
+        @media (min-width: 560px) { .servicos-grade-preview { grid-template-columns: repeat(2, minmax(0,1fr)) !important; } }
+      `}</style>
+
       {/* ABERTURA */}
-      <header className="secao-abertura">
-        <div className="abertura-conteudo">
-          <h1>Conheça a rede de cuidado do seu território</h1>
-          <p>
+      <header style={{ padding: "5rem 1.5rem 3.5rem", borderBottom: `1px solid ${cores.linha}`, textAlign: "center" }}>
+        <div style={{ maxWidth: 640, margin: "0 auto" }}>
+          <h1 style={{ fontFamily: "Georgia, serif", fontWeight: 500, fontSize: "2.2rem", lineHeight: 1.35, margin: "0 0 0.6em", color: cores.tinta }}>
+            Conheça a rede de cuidado do seu território
+          </h1>
+          <p style={{ color: cores.tintaSuave, fontSize: "1.1rem", maxWidth: "52ch", margin: "0 auto 2.2rem", lineHeight: 1.6 }}>
             Um espaço para visualizar os principais serviços disponíveis em
             Brazlândia, Ceilândia e Sol Nascente/Pôr do Sol, entendendo onde
             estão localizados e qual é a função de cada um.
           </p>
-          <a href="#mapa" className="botao-explorar">
+          <a
+            href="#mapa"
+            style={{ display: "inline-block", textDecoration: "none", fontWeight: 600, color: "#fff", background: cores.acento, padding: "0.85rem 1.8rem", borderRadius: 3 }}
+          >
             Explorar o mapa ↓
           </a>
         </div>
       </header>
 
       {/* MAPA */}
-      <section id="mapa" className="secao-mapa">
-        <div>
-          <div className="mapa-cabecalho">
-            <h2>Seu mapa</h2>
-            <p>
-              Toque em uma região para abrir o mapa digital com os serviços
-              daquele território.
-            </p>
-          </div>
-
-          <div className="mapa-corpo">
-            <Tilt className="mapa-tilt" max={6}>
-              <MapaTerritorio
-                regiaoAtiva={regiaoAtiva}
-                setRegiaoAtiva={setRegiaoAtiva}
-              />
-            </Tilt>
-
-            <div className="mapa-legenda">
-              {REGIOES.map((regiao) => (
-                <button
-                  key={regiao.id}
-                  className="legenda-item"
-                  style={{
-                    borderColor: regiao.cor,
-                    background:
-                      regiaoAtiva === regiao.id ? regiao.corClara : "transparent",
-                  }}
-                  onMouseEnter={() => setRegiaoAtiva(regiao.id)}
-                  onMouseLeave={() => setRegiaoAtiva(null)}
-                  onFocus={() => setRegiaoAtiva(regiao.id)}
-                  onBlur={() => setRegiaoAtiva(null)}
-                  onClick={() => window.open(regiao.link, "_blank", "noopener")}
-                >
-                  <span
-                    className="legenda-cor"
-                    style={{ background: regiao.cor }}
-                  />
-                  {regiao.nome}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <p className="mapa-dica" aria-live="polite">
-            {regiaoDestacada
-              ? `Abrir mapa de ${regiaoDestacada.nome}`
-              : "Passe o mouse ou toque em uma das três regiões acima"}
+      <section id="mapa" style={{ padding: "4rem 1.5rem", borderBottom: `1px solid ${cores.linha}` }}>
+        <div style={{ maxWidth: 640, margin: "0 auto 2rem", textAlign: "center" }}>
+          <h2 style={{ fontFamily: "Georgia, serif", fontWeight: 500, fontSize: "1.8rem", margin: "0 0 0.6em", color: cores.tinta }}>Seu mapa</h2>
+          <p style={{ color: cores.tintaSuave, lineHeight: 1.6 }}>
+            Toque em uma região para abrir o mapa digital com os serviços daquele território.
           </p>
         </div>
+
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1.6rem" }}>
+          <Tilt max={6} style={{ width: "100%", maxWidth: 540, filter: "drop-shadow(0 18px 30px rgba(42,38,32,0.18))" }}>
+            <MapaTerritorio regiaoAtiva={regiaoAtiva} setRegiaoAtiva={setRegiaoAtiva} />
+          </Tilt>
+
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "0.75rem" }}>
+            {REGIOES.map((regiao) => (
+              <button
+                key={regiao.id}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.55rem",
+                  fontSize: "0.95rem",
+                  fontWeight: 500,
+                  color: cores.tinta,
+                  background: regiaoAtiva === regiao.id ? regiao.corClara : "transparent",
+                  border: `1.5px solid ${regiao.cor}`,
+                  borderRadius: 999,
+                  padding: "0.5rem 1.1rem",
+                  cursor: "pointer",
+                  transition: "transform 0.15s ease",
+                }}
+                onMouseEnter={(e) => { setRegiaoAtiva(regiao.id); e.currentTarget.style.transform = "translateY(-2px)"; }}
+                onMouseLeave={(e) => { setRegiaoAtiva(null); e.currentTarget.style.transform = "translateY(0)"; }}
+                onFocus={() => setRegiaoAtiva(regiao.id)}
+                onBlur={() => setRegiaoAtiva(null)}
+                onClick={() => window.open(regiao.link, "_blank", "noopener")}
+              >
+                <span style={{ width: "0.7rem", height: "0.7rem", borderRadius: "50%", background: regiao.cor, display: "inline-block" }} />
+                {regiao.nome}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <p style={{ textAlign: "center", marginTop: "1.6rem", fontSize: "0.95rem", minHeight: "1.4em" }}>
+          {regiaoDestacada ? `Abrir mapa de ${regiaoDestacada.nome}` : "Passe o mouse ou toque em uma das três regiões acima"}
+        </p>
       </section>
 
       {/* CONHECENDO O TERRITÓRIO */}
-      <section className="secao-territorio">
-        <div>
-          <div className="territorio-cabecalho">
-            <h2>Conhecendo o território</h2>
-            <p>
-              Conheça um pouco das regiões que fazem parte do nosso
-              território.
-            </p>
-          </div>
+      <section style={{ padding: "4rem 1.5rem", borderBottom: `1px solid ${cores.linha}` }}>
+        <div style={{ maxWidth: 640, margin: "0 auto 2rem", textAlign: "center" }}>
+          <h2 style={{ fontFamily: "Georgia, serif", fontWeight: 500, fontSize: "1.8rem", margin: "0 0 0.6em", color: cores.tinta }}>Conhecendo o território</h2>
+          <p style={{ color: cores.tintaSuave }}>Conheça um pouco das regiões que fazem parte do nosso território.</p>
+        </div>
 
-          <div className="territorio-grade">
-            {REGIOES.map((regiao) => (
-              <Tilt
-                key={regiao.id}
-                className="territorio-card"
-                max={5}
-              >
-                <div className="territorio-topo">
-                  <span
-                    className="territorio-ponto"
-                    style={{ background: regiao.cor }}
-                  />
-                  <h3>{regiao.nome}</h3>
+        <div
+          style={{
+            maxWidth: 1080,
+            margin: "0 auto",
+            display: "grid",
+            gridTemplateColumns: "1fr",
+            gap: "1.5rem",
+          }}
+          className="territorio-grade-preview"
+        >
+          {REGIOES.map((regiao) => (
+            <Tilt
+              key={regiao.id}
+              max={5}
+              style={{
+                background: "#fbf4e6",
+                border: `1px solid ${cores.linha}`,
+                borderRadius: 10,
+                padding: "1.8rem 1.6rem",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "stretch",
+                gap: "1.2rem",
+                boxShadow: "0 6px 16px rgba(42,38,32,0.07)",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "flex-start", gap: "0.7rem", minHeight: "2.6rem" }}>
+                <span style={{ width: "0.9rem", height: "0.9rem", borderRadius: "50%", background: regiao.cor, flexShrink: 0, marginTop: "0.45rem" }} />
+                <h3 style={{ fontFamily: "Georgia, serif", fontWeight: 600, fontSize: "1.2rem", margin: 0, color: cores.tinta }}>{regiao.nome}</h3>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem 1.6rem" }}>
+                <div>
+                  <div style={{ fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.04em", color: cores.tintaSuave }}>População</div>
+                  <div style={{ marginTop: "0.15rem", fontFamily: "Georgia, serif", fontSize: "1.05rem", color: cores.tinta }}>{regiao.populacao}</div>
                 </div>
+                <div>
+                  <div style={{ fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.04em", color: cores.tintaSuave }}>Área</div>
+                  <div style={{ marginTop: "0.15rem", fontFamily: "Georgia, serif", fontSize: "1.05rem", color: cores.tinta }}>{regiao.area}</div>
+                </div>
+              </div>
 
-                <dl className="territorio-stats">
-                  <div>
-                    <dt>População</dt>
-                    <dd>{regiao.populacao}</dd>
-                  </div>
-                  <div>
-                    <dt>Área</dt>
-                    <dd>{regiao.area}</dd>
-                  </div>
-                </dl>
-
-                {regiao.naoIdentificados.length > 0 && (
-                  <div className="territorio-nao-identificados">
-                    <p className="territorio-nao-identificados-titulo">
-                      Serviços não identificados no território
-                    </p>
-                    <ul>
-                      {regiao.naoIdentificados.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </Tilt>
-            ))}
-          </div>
+              {regiao.naoIdentificados.length > 0 && (
+                <div style={{ borderTop: `1px dashed ${cores.linha}`, paddingTop: "1rem" }}>
+                  <p style={{ margin: "0 0 0.5rem", fontSize: "0.85rem", fontWeight: 600, color: cores.tinta }}>
+                    Serviços não identificados no território
+                  </p>
+                  <ul style={{ margin: 0, paddingLeft: "1.1rem", display: "flex", flexDirection: "column", gap: "0.35rem" }}>
+                    {regiao.naoIdentificados.map((item) => (
+                      <li key={item} style={{ fontSize: "0.88rem", color: cores.tintaSuave, lineHeight: 1.45 }}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </Tilt>
+          ))}
         </div>
       </section>
 
       {/* SERVIÇOS */}
-      <section className="secao-servicos">
-        <div>
-          <div className="servicos-cabecalho">
-            <h2>🔍 Conheça os principais serviços</h2>
-            <p>Toque em um serviço para ver o que ele faz.</p>
-          </div>
+      <section style={{ padding: "3.5rem 1.5rem", borderBottom: `1px solid ${cores.linha}` }}>
+        <div style={{ maxWidth: 640, margin: "0 auto 2rem", textAlign: "center" }}>
+          <h2 style={{ fontFamily: "Georgia, serif", fontWeight: 500, fontSize: "1.8rem", margin: "0 0 0.6em", color: cores.tinta }}>🔍 Conheça os principais serviços</h2>
+          <p style={{ color: cores.tintaSuave }}>Toque em um serviço para ver o que ele faz.</p>
+        </div>
 
-          <div className="servicos-grade">
-            {SERVICOS.map((servico) => {
-              const aberto = servicosAbertos.includes(servico.id);
-              return (
-                <Tilt
-                  key={servico.id}
-                  className="servico-card"
-                  max={4}
+        <div className="servicos-grade-preview" style={{ maxWidth: 760, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr", gap: "1.2rem" }}>
+          {SERVICOS.map((servico) => {
+            const aberto = servicosAbertos.includes(servico.id);
+            return (
+              <Tilt
+                key={servico.id}
+                max={4}
+                style={{ background: "#fbf4e6", border: `1px solid ${cores.linha}`, borderRadius: 10, overflow: "hidden", boxShadow: "0 6px 16px rgba(42,38,32,0.07)" }}
+              >
+                <button
+                  type="button"
+                  onClick={() => alternarServico(servico.id)}
+                  aria-expanded={aberto}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.9rem",
+                    width: "100%",
+                    background: "none",
+                    border: "none",
+                    textAlign: "left",
+                    cursor: "pointer",
+                    padding: "1.5rem 1.4rem",
+                    fontFamily: "inherit",
+                    color: cores.tinta,
+                  }}
                 >
-                  <button
-                    type="button"
-                    className="servico-topo"
-                    aria-expanded={aberto}
-                    aria-controls={`servico-${servico.id}`}
-                    onClick={() => alternarServico(servico.id)}
+                  <span className="servico-emoji-anim" style={{ fontSize: "1.7rem", flexShrink: 0 }} aria-hidden="true">
+                    {servico.emoji}
+                  </span>
+                  <span style={{ flex: 1, display: "flex", flexDirection: "column", gap: "0.15rem" }}>
+                    <span style={{ fontFamily: "Georgia, serif", fontWeight: 600, fontSize: "1.2rem" }}>{servico.sigla}</span>
+                    <span style={{ fontSize: "0.9rem", color: cores.tintaSuave }}>{servico.descricao}</span>
+                  </span>
+                  <span
+                    style={{
+                      flexShrink: 0,
+                      fontSize: "1rem",
+                      color: cores.tintaSuave,
+                      transition: "transform 0.25s ease",
+                      transform: aberto ? "rotate(180deg)" : "rotate(0deg)",
+                    }}
                   >
-                    <span className="servico-emoji" aria-hidden="true">
-                      {servico.emoji}
-                    </span>
-                    <span className="servico-titulos">
-                      <h3>{servico.sigla}</h3>
-                      <p>{servico.descricao}</p>
-                    </span>
-                    <span className={`servico-seta ${aberto ? "aberta" : ""}`}>
-                      ↓
-                    </span>
-                  </button>
+                    ↓
+                  </span>
+                </button>
 
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateRows: aberto ? "1fr" : "0fr",
+                    opacity: aberto ? 1 : 0,
+                    transition: "grid-template-rows 0.3s ease, opacity 0.25s ease",
+                  }}
+                >
                   <div
-                    id={`servico-${servico.id}`}
-                    className={`servico-explicacao ${aberto ? "aberta" : ""}`}
+                    style={{
+                      overflow: "hidden",
+                      minHeight: 0,
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                      gap: "0.8rem",
+                      padding: aberto ? "0 1.4rem 1.4rem" : "0 1.4rem",
+                    }}
                   >
-                    <div className="servico-explicacao-interior">
-                      <p>{servico.explicacao}</p>
-                      <p className="servico-encontra">
-                        <strong>Você encontra:</strong>{" "}
-                        {servico.encontra.join(" • ")}
-                      </p>
-                    </div>
+                    <p style={{ margin: 0, fontSize: "0.95rem", color: cores.tintaSuave }}>{servico.explicacao}</p>
+                    <p style={{ margin: 0, fontSize: "0.95rem", color: cores.tintaSuave }}>
+                      <strong style={{ color: cores.tinta }}>Você encontra:</strong> {servico.encontra.join(" • ")}
+                    </p>
                   </div>
-                </Tilt>
-              );
-            })}
-          </div>
+                </div>
+              </Tilt>
+            );
+          })}
         </div>
       </section>
 
-      {/* SOBRE O PROJETO */}
-      <section className="secao-sobre">
-        <div>
-          <div className="sobre-conteudo">
-            <h2>Sobre o projeto</h2>
-            <p>
-              Este projeto foi desenvolvido por estudantes de Terapia
-              Ocupacional com o objetivo de apresentar, de forma visual e
-              acessível, os serviços presentes no território e sua
-              importância para a rede de cuidado.
+      {/* SOBRE */}
+      <section style={{ padding: "4rem 1.5rem", borderBottom: `1px solid ${cores.linha}` }}>
+        <div style={{ maxWidth: 640, margin: "0 auto" }}>
+          <h2 style={{ fontFamily: "Georgia, serif", fontWeight: 500, fontSize: "1.8rem", margin: "0 0 0.6em", color: cores.tinta }}>Sobre o projeto</h2>
+          <p style={{ color: cores.tintaSuave, fontSize: "1.05rem", lineHeight: 1.6, maxWidth: "62ch" }}>
+            Este projeto foi desenvolvido por estudantes de Terapia Ocupacional com o objetivo de apresentar, de
+            forma visual e acessível, os serviços presentes no território e sua importância para a rede de cuidado.
+          </p>
+
+          <dl
+            style={{
+              margin: "2rem 0 0",
+              display: "grid",
+              gridTemplateColumns: "repeat(2, minmax(0,1fr))",
+              gap: "1.2rem 2rem",
+              paddingTop: "1.4rem",
+              borderTop: `1px solid ${cores.linha}`,
+            }}
+          >
+            {[
+              ["Curso", "Terapia Ocupacional"],
+              ["Instituição", "IESB"],
+              ["Disciplina", "Terapia Ocupacional na Saúde Mental"],
+              ["Ano", "2026"],
+            ].map(([dt, dd]) => (
+              <div key={dt}>
+                <dt style={{ fontSize: "0.85rem", color: cores.tintaSuave }}>{dt}</dt>
+                <dd style={{ margin: 0, fontFamily: "Georgia, serif", fontSize: "1.05rem" }}>{dd}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <div style={{ marginTop: "2.2rem", paddingTop: "1.8rem", borderTop: `1px solid ${cores.linha}`, textAlign: "center" }}>
+            <p style={{ margin: "0 0 1rem", fontSize: "0.85rem", textTransform: "uppercase", letterSpacing: "0.06em", color: cores.tintaSuave }}>
+              Desenvolvido por
             </p>
-
-            <dl className="sobre-ficha">
-              <div>
-                <dt>Curso</dt>
-                <dd>Terapia Ocupacional</dd>
-              </div>
-              <div>
-                <dt>Instituição</dt>
-                <dd>IESB</dd>
-              </div>
-              <div>
-                <dt>Disciplina</dt>
-                <dd>Terapia Ocupacional na Saúde Mental</dd>
-              </div>
-              <div>
-                <dt>Ano</dt>
-                <dd>2026</dd>
-              </div>
-            </dl>
-
-            <div className="sobre-autores">
-              <p className="sobre-autores-titulo">Desenvolvido por</p>
-              <ul className="autores-lista">
-                <li>Sarah Cristina</li>
-                <li>Ludmylla Lopes</li>
-                <li>Sarah Barbosa</li>
-                <li>Samara Vieira</li>
-                <li>Endryo Ferreira</li>
-                <li>Micael Santos</li>
-              </ul>
-            </div>
+            <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "0.6rem 0.7rem" }}>
+              {["Sarah Cristina", "Ludmylla Lopes", "Sarah Barbosa", "Samara Vieira", "Endryo Ferreira", "Micael Santos"].map((nome) => (
+                <li
+                  key={nome}
+                  style={{
+                    fontFamily: "Georgia, serif",
+                    fontSize: "1rem",
+                    color: cores.tinta,
+                    background: "#fbf4e6",
+                    border: `1px solid ${cores.linha}`,
+                    borderRadius: 999,
+                    padding: "0.45rem 1.1rem",
+                  }}
+                >
+                  {nome}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
 
       {/* RODAPÉ */}
-      <footer className="rodape">
-        <p>
-          Conhecer o território é também conhecer os caminhos possíveis para
-          o cuidado.
+      <footer style={{ padding: "3rem 1.5rem", textAlign: "center" }}>
+        <p style={{ fontFamily: "Georgia, serif", fontStyle: "italic", fontSize: "1.1rem", maxWidth: "44ch", margin: "0 auto", color: cores.tinta }}>
+          Conhecer o território é também conhecer os caminhos possíveis para o cuidado.
         </p>
       </footer>
     </div>

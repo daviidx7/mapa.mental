@@ -12,6 +12,7 @@
   --amarelo-claro: #fbf1dc;
   --acento: #2f6f62;
   --linha: #e0d3b8;
+  --cartao: #fbf4e6;
 }
 
 * {
@@ -271,7 +272,7 @@ a {
 }
 
 .territorio-card {
-  background: #fffdf8;
+  background: var(--cartao);
   border: 1px solid var(--linha);
   border-radius: 10px;
   padding: 1.8rem 1.6rem;
@@ -393,7 +394,7 @@ a {
 }
 
 .servico-card {
-  background: #fffdf8;
+  background: var(--cartao);
   border: 1px solid var(--linha);
   border-radius: 10px;
   overflow: hidden;
@@ -585,7 +586,7 @@ a {
   font-family: "Fraunces", serif;
   font-size: 1rem;
   color: var(--tinta);
-  background: #fffdf8;
+  background: var(--cartao);
   border: 1px solid var(--linha);
   border-radius: 999px;
   padding: 0.45rem 1.1rem;
