@@ -434,7 +434,7 @@ export default function App() {
           rel="noopener noreferrer"
           className="rodape-credito"
         >
-          feito por @daviidev - David Ferreira
+          feito por @daviiddev - David Ferreira
         </a>
       </footer>
     </div>
